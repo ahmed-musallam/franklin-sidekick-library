@@ -39,7 +39,7 @@ import { sampleRUM } from '../../utils/rum.js';
  * @returns {String} HTML string
  */
 function renderScaffolding() {
-  return /* html */ `
+  return /* html */`
     <sp-split-view 
         primary-size="350" 
         dir="ltr" 
@@ -87,10 +87,8 @@ function getViewPorts(contextViewPorts) {
     },
   ];
   if (contextViewPorts && contextViewPorts.length > 0) {
-    if (
-      contextViewPorts.length === 2
-      && contextViewPorts.every(breakpoint => Number.isInteger(breakpoint))
-    ) {
+    if (contextViewPorts.length === 2
+      && contextViewPorts.every(breakpoint => Number.isInteger(breakpoint))) {
       for (let i = 0; i < 2; i += 1) {
         viewPorts[i].width = `${contextViewPorts[i] - 1}px`;
       }
@@ -396,7 +394,7 @@ function loadBlock(context, event, container) {
   );
 
   // Append the path and index of the current block to the url params
-  setURLParams([['path', blockData.path]], ['index']);
+  setURLParams([['path', blockData.path], ['index', event.detail.index]]);
 
   // Attach copy button event listener
   attachCopyButtonEventListener(
@@ -432,9 +430,8 @@ function loadTemplate(context, event, container) {
   const authoredTemplateName = defaultLibraryMetadata.name ?? blockData.name;
 
   // Pull the description for this page from default metadata.
-  const templateDescription = parseDescription(
-    defaultLibraryMetadata.description,
-  );
+  const templateDescription = parseDescription(defaultLibraryMetadata.description);
+
 
   // Set template title & description in UI
   updateDetailsContainer(content, authoredTemplateName, templateDescription);
@@ -501,11 +498,7 @@ function handleSplitView(container, sectionLibraryMetadata, defaultLibraryMetada
 export async function decorate(container, data, searchTerm, context) {
   container.dispatchEvent(new CustomEvent('ShowLoader'));
 
-  const content = createTag(
-    'div',
-    { class: 'block-library' },
-    renderScaffolding(),
-  );
+  const content = createTag('div', { class: 'block-library' }, renderScaffolding());
   container.append(content);
   const listContainer = content.querySelector('.list-container');
 
