@@ -108,22 +108,16 @@ function getViewPorts(contextViewPorts) {
 function renderFrame(contextViewPorts, container) {
   if (!isFrameLoaded(container)) {
     const viewPorts = getViewPorts(contextViewPorts);
-    const viewPortsHTML = viewPorts
-      .map(
-        (viewPort, index) => /* html */ `
+    const viewPortsHTML = viewPorts.map((viewPort, index) => /* html */`
       <sp-action-button value="viewPort${index}">
         <sp-icon-${viewPort.icon} slot="icon"></sp-icon-${viewPort.icon}>
           ${viewPort.label}
         </sp-action-button>
-    `,
-      )
-      .join('');
-    const selectedViewPortIndex = viewPorts.findIndex(
-      viewPort => viewPort.default,
-    );
+    `).join('');
+    const selectedViewPortIndex = viewPorts.findIndex(viewPort => viewPort.default);
 
     const contentContainer = container.querySelector('.content');
-    contentContainer.innerHTML = /* html */ `
+    contentContainer.innerHTML = /* html */`
       <sp-split-view
         vertical
         resizable
@@ -167,14 +161,12 @@ function renderFrame(contextViewPorts, container) {
     const frameView = container.querySelector('.frame-view');
     frameView.style.width = viewPorts[selectedViewPortIndex].width;
 
-    [...container.querySelectorAll('sp-action-button')].forEach(
-      (button, index) => {
-        const buttonClone = removeAllEventListeners(button);
-        buttonClone?.addEventListener('click', () => {
-          frameView.style.width = viewPorts[index].width;
-        });
-      },
-    );
+    [...container.querySelectorAll('sp-action-button')].forEach((button, index) => {
+      const buttonClone = removeAllEventListeners(button);
+      buttonClone?.addEventListener('click', () => {
+        frameView.style.width = viewPorts[index].width;
+      });
+    });
   }
 }
 
@@ -235,9 +227,7 @@ function attachCopyButtonEventListener(
   sectionLibraryMetadata,
   pageMetadata,
 ) {
-  const copyButton = removeAllEventListeners(
-    container.querySelector('.content .copy-button'),
-  );
+  const copyButton = removeAllEventListeners(container.querySelector('.content .copy-button'));
   copyButton.addEventListener('click', async () => {
     const copyElement = blockRenderer.getBlockElement();
     const copyWrapper = blockRenderer.getBlockWrapper();
@@ -245,11 +235,7 @@ function attachCopyButtonEventListener(
 
     // Are we trying to copy a block, a page or default content?
     // The copy operation is slightly different depending on which
-    if (
-      defaultLibraryMetadata.type === 'template'
-      || sectionLibraryMetadata.multiSectionBlock
-      || sectionLibraryMetadata.compoundBlock
-    ) {
+    if (defaultLibraryMetadata.type === 'template' || sectionLibraryMetadata.multiSectionBlock || sectionLibraryMetadata.compoundBlock) {
       await copyPageToClipboard(
         context,
         copyWrapper,
@@ -257,10 +243,7 @@ function attachCopyButtonEventListener(
         pageMetadata,
       );
     } else if (blockRenderer.isBlock) {
-      const tableStyle = getBlockTableStyle(
-        defaultLibraryMetadata,
-        sectionLibraryMetadata,
-      );
+      const tableStyle = getBlockTableStyle(defaultLibraryMetadata, sectionLibraryMetadata);
       await copyBlockToClipboard(
         context,
         copyWrapper,
@@ -269,16 +252,10 @@ function attachCopyButtonEventListener(
         tableStyle,
       );
     } else {
-      await copyDefaultContentToClipboard(
-        context,
-        copyWrapper,
-        copyBlockData.url,
-      );
+      await copyDefaultContentToClipboard(context, copyWrapper, copyBlockData.url);
     }
 
-    container.dispatchEvent(
-      new CustomEvent('Toast', { detail: { message: 'Copied Block' } }),
-    );
+    container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block' } }));
   });
 }
 
@@ -341,27 +318,15 @@ async function onBlockListCopyButtonClicked(context, event, container) {
   // We may not have rendered the block yet, so we need to check for a block to know if
   // we are dealing with a block or default content
   const block = wrapper.querySelector(':scope > div:not(.section-metadata)');
-  if (
-    defaultLibraryMetadata
-    && (defaultLibraryMetadata.type === 'template'
-      || sectionLibraryMetadata.multiSectionBlock
-      || sectionLibraryMetadata.compoundBlock)
-  ) {
+  if (defaultLibraryMetadata && (defaultLibraryMetadata.type === 'template' || sectionLibraryMetadata.multiSectionBlock || sectionLibraryMetadata.compoundBlock)) {
     await copyPageToClipboard(context, wrapper, blockURL, pageMetadata);
   } else if (block) {
-    const tableStyle = getBlockTableStyle(
-      defaultLibraryMetadata,
-      sectionLibraryMetadata,
-    );
+    const tableStyle = getBlockTableStyle(defaultLibraryMetadata, sectionLibraryMetadata);
     await copyBlockToClipboard(context, wrapper, name, blockURL, tableStyle);
   } else {
     await copyDefaultContentToClipboard(context, wrapper, blockURL);
   }
-  container.dispatchEvent(
-    new CustomEvent('Toast', {
-      detail: { message: 'Copied Block', target: wrapper },
-    }),
-  );
+  container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', target: wrapper } }));
 }
 
 async function triggerTableReady(
@@ -416,12 +381,7 @@ function loadBlock(context, event, container) {
   updateDetailsContainer(content, authoredBlockName, blockDescription);
 
   handleCopyButton(container, sectionLibraryMetadata, defaultLibraryMetadata);
-  handleSplitView(
-    container,
-    sectionLibraryMetadata,
-    defaultLibraryMetadata,
-    context,
-  );
+  handleSplitView(container, sectionLibraryMetadata, defaultLibraryMetadata, context);
 
   const blockRenderer = content.querySelector('block-renderer');
 
@@ -436,10 +396,7 @@ function loadBlock(context, event, container) {
   );
 
   // Append the path and index of the current block to the url params
-  setURLParams([
-    ['path', blockData.path],
-    ['index', event.detail.index],
-  ]);
+  setURLParams([['path', blockData.path]], ['index']);
 
   // Attach copy button event listener
   attachCopyButtonEventListener(
@@ -451,13 +408,7 @@ function loadBlock(context, event, container) {
     undefined,
   );
 
-  triggerTableReady(
-    context,
-    blockRenderer,
-    defaultLibraryMetadata,
-    sectionLibraryMetadata,
-    undefined,
-  );
+  triggerTableReady(context, blockRenderer, defaultLibraryMetadata, sectionLibraryMetadata, undefined);
 
   // Track block view
   sampleRUM('library:blockviewed', { target: blockData.url });
@@ -489,12 +440,7 @@ function loadTemplate(context, event, container) {
   updateDetailsContainer(content, authoredTemplateName, templateDescription);
 
   handleCopyButton(container, sectionLibraryMetadata, defaultLibraryMetadata);
-  handleSplitView(
-    container,
-    sectionLibraryMetadata,
-    defaultLibraryMetadata,
-    context,
-  );
+  handleSplitView(container, sectionLibraryMetadata, defaultLibraryMetadata, context);
 
   const blockRenderer = content.querySelector('block-renderer');
 
@@ -525,11 +471,7 @@ function loadTemplate(context, event, container) {
   sampleRUM('library:blockviewed', { target: blockData.url });
 }
 
-function handleCopyButton(
-  container,
-  sectionLibraryMetadata,
-  defaultLibraryMetadata,
-) {
+function handleCopyButton(container, sectionLibraryMetadata, defaultLibraryMetadata) {
   const disableCopyButton = sectionLibraryMetadata?.disablecopy
     ?? defaultLibraryMetadata?.disablecopy
     ?? false;
@@ -541,12 +483,7 @@ function handleCopyButton(
   }
 }
 
-function handleSplitView(
-  container,
-  sectionLibraryMetadata,
-  defaultLibraryMetadata,
-  context,
-) {
+function handleSplitView(container, sectionLibraryMetadata, defaultLibraryMetadata, context) {
   const hideDetailsView = sectionLibraryMetadata?.hidedetailsview
     ?? defaultLibraryMetadata?.hidedetailsview
     ?? context?.hidedetailsview
