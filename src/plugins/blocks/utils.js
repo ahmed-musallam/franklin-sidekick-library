@@ -24,7 +24,7 @@ export function blockToObject(blockElement, excludes = [], convertKeys = true) {
   if (blockElement) {
     const result = {};
     const config = readBlockConfig(blockElement, convertKeys);
-    Object.keys(config).forEach(key => {
+    Object.keys(config).forEach((key) => {
       if (excludes.includes(key)) return;
 
       if (convertKeys) {
@@ -76,13 +76,13 @@ export function getPageMetadata(block) {
 export function getDefaultLibraryMetadata(document) {
   // Check for a section that just contains library metadata and nothing else
   const defaultLibraryMetadataElement = document.querySelector(
-    ':scope > div > .library-metadata:only-child'
+    ':scope > div > .library-metadata:only-child',
   );
   if (defaultLibraryMetadataElement) {
     // We found some default library metadata, store the parent element
     const parent = defaultLibraryMetadataElement.parentElement;
     const defaultLibraryMetadata = getLibraryMetadata(
-      defaultLibraryMetadataElement.parentElement
+      defaultLibraryMetadataElement.parentElement,
     );
 
     // Remove the parent
@@ -104,7 +104,7 @@ export function getBlockName(block, includeVariants = true) {
 
   // Remove the "sidekick-library" class or any empty classes
   const filteredClasses = classes.filter(
-    blockClass => blockClass !== 'sidekick-library' && blockClass !== ''
+    blockClass => blockClass !== 'sidekick-library' && blockClass !== '',
   );
   return filteredClasses.length > 0
     ? `${name} (${filteredClasses.join(', ')})`
@@ -116,7 +116,7 @@ export function getPreferedBackgroundColor(blockName) {
   if (blockName === 'Section Metadata') {
     return (
       getComputedStyle(document.documentElement).getPropertyValue(
-        '--sk-section-metadata-table-background-color'
+        '--sk-section-metadata-table-background-color',
       ) || defaultBackgroundColor
     );
   }
@@ -124,14 +124,14 @@ export function getPreferedBackgroundColor(blockName) {
   if (blockName === 'Metadata') {
     return (
       getComputedStyle(document.documentElement).getPropertyValue(
-        '--sk-metadata-table-background-color'
+        '--sk-metadata-table-background-color',
       ) || defaultBackgroundColor
     );
   }
 
   return (
     getComputedStyle(document.documentElement).getPropertyValue(
-      '--sk-block-table-background-color'
+      '--sk-block-table-background-color',
     ) || defaultBackgroundColor
   );
 }
@@ -141,7 +141,7 @@ export function getPreferedForegroundColor(blockName) {
   if (blockName === 'Section Metadata') {
     return (
       getComputedStyle(document.documentElement).getPropertyValue(
-        '--sk-section-metadata-table-foreground-color'
+        '--sk-section-metadata-table-foreground-color',
       ) || defaultForegroundColor
     );
   }
@@ -149,14 +149,14 @@ export function getPreferedForegroundColor(blockName) {
   if (blockName === 'Metadata') {
     return (
       getComputedStyle(document.documentElement).getPropertyValue(
-        '--sk-metadata-table-foreground-color'
+        '--sk-metadata-table-foreground-color',
       ) || defaultForegroundColor
     );
   }
 
   return (
     getComputedStyle(document.documentElement).getPropertyValue(
-      '--sk-block-table-foreground-color'
+      '--sk-block-table-foreground-color',
     ) || defaultForegroundColor
   );
 }
@@ -165,9 +165,7 @@ export function normalizeBlockName(name) {
   // eslint-disable-next-line no-confusing-arrow
   return name
     .replace(/-/g, ' ')
-    .replace(/(\b\w+)|(?:\([^)]*\))/g, (match, p1) =>
-      p1 ? p1.charAt(0).toUpperCase() + p1.slice(1) : match
-    );
+    .replace(/(\b\w+)|(?:\([^)]*\))/g, (match, p1) => (p1 ? p1.charAt(0).toUpperCase() + p1.slice(1) : match));
 }
 
 export async function convertBlockToTable(
@@ -175,7 +173,7 @@ export async function convertBlockToTable(
   block,
   name,
   path,
-  tableStyle
+  tableStyle,
 ) {
   const url = new URL(path);
 
@@ -184,7 +182,7 @@ export async function convertBlockToTable(
   const rows = [...block.children];
   const maxCols = rows.reduce(
     (cols, row) => (row.children.length > cols ? row.children.length : cols),
-    0
+    0,
   );
 
   const table = document.createElement('table');
@@ -199,15 +197,15 @@ export async function convertBlockToTable(
       {
         colspan: maxCols,
         style: `background-color: ${
-          tableStyle?.tableHeaderBackgroundColor ||
-          getPreferedBackgroundColor(blockName)
+          tableStyle?.tableHeaderBackgroundColor
+          || getPreferedBackgroundColor(blockName)
         }; color: ${
-          tableStyle?.tableHeaderForegroundColor ||
-          getPreferedForegroundColor(blockName)
+          tableStyle?.tableHeaderForegroundColor
+          || getPreferedForegroundColor(blockName)
         };`,
       },
-      blockName
-    )
+      blockName,
+    ),
   );
   table.append(headerRow);
   for (const row of rows) {
@@ -255,11 +253,11 @@ export function convertObjectToTable(name, object) {
       {
         colspan: 2,
         style: `background-color: ${getPreferedBackgroundColor(
-          blockName
+          blockName,
         )}; color: ${getPreferedForegroundColor(blockName)};`,
       },
-      blockName
-    )
+      blockName,
+    ),
   );
   table.append(headerRow);
 
@@ -292,7 +290,7 @@ async function imageUrlToBase64(url) {
   return new Promise((resolve, reject) => {
     try {
       const reader = new FileReader();
-      reader.onload = res => {
+      reader.onload = (res) => {
         resolve(res.target.result);
       };
       reader.readAsDataURL(blob);
@@ -314,7 +312,7 @@ export async function prepareImagesForCopy(
   context,
   element,
   url,
-  columnWidthPercentage
+  columnWidthPercentage,
 ) {
   const blockURL = typeof url === 'string' ? new URL(url) : url;
   const images = element.querySelectorAll('img');
@@ -343,10 +341,9 @@ export async function prepareImagesForCopy(
       }
     }
 
-    const maxWidth =
-      columnWidthPercentage !== 100
-        ? Math.min(295, (columnWidthPercentage / 100) * 540)
-        : 650;
+    const maxWidth = columnWidthPercentage !== 100
+      ? Math.min(295, (columnWidthPercentage / 100) * 540)
+      : 650;
     const originalWidth = img.width;
     const originalHeight = img.height;
 
@@ -375,7 +372,7 @@ export async function prepareImagesForCopy(
  * @param {HTMLElement} element The element to prepare
  */
 export function prepareIconsForCopy(element) {
-  element.querySelectorAll('span.icon').forEach(icon => {
+  element.querySelectorAll('span.icon').forEach((icon) => {
     const classNames = icon.className.split(' ');
 
     // Loop through each class
@@ -390,7 +387,7 @@ export function prepareIconsForCopy(element) {
         // eslint-disable-next-line no-param-reassign
         icon.parentElement.innerHTML = icon.parentElement.innerHTML.replace(
           /<span\b[^>]*>(.*?)<\/span>/,
-          `:${iconName}:`
+          `:${iconName}:`,
         );
         break;
       }
@@ -406,7 +403,7 @@ export function prepareIconsForCopy(element) {
  */
 export function prepareAnchorsForCopy(element) {
   const { origin } = window.location;
-  element.querySelectorAll('a').forEach(anchor => {
+  element.querySelectorAll('a').forEach((anchor) => {
     const path = anchor.getAttribute('href');
     if (isPath(path)) {
       anchor.href = `${origin}${path}`;
@@ -454,7 +451,7 @@ async function getSectionMetadata(context, block, baseURL) {
       context,
       sectionMetadata,
       'section metadata',
-      baseURL
+      baseURL,
     );
   }
 }
@@ -472,7 +469,7 @@ export function copyToClipboard(context, data, prepare) {
     const clipboardData = [
       new ClipboardItem({
         'text/html': new Promise((resolve, reject) => {
-          prepare(context, data).then(html => {
+          prepare(context, data).then((html) => {
             try {
               const blob = new Blob([html.outerHTML], { type: 'text/html' });
               resolve(blob);
@@ -507,7 +504,7 @@ export async function prepareBlockForCopy(ctx, data, blockURL, tableStyle) {
       element,
       blockName,
       blockURL,
-      tableStyle
+      tableStyle,
     );
   }
 
@@ -533,7 +530,7 @@ export async function copyBlockToClipboard(
   wrapper,
   name,
   blockURL,
-  tableStyle
+  tableStyle,
 ) {
   async function prepare(ctx, data) {
     return prepareBlockForCopy(ctx, data, blockURL, tableStyle);
@@ -564,7 +561,7 @@ export async function prepareDefaultContentForCopy(ctx, data, blockURL) {
     wrapperClone.append(sectionMetadataTable);
 
     const sectionMetadata = wrapperClone.querySelector(
-      ':scope > .section-metadata'
+      ':scope > .section-metadata',
     );
     sectionMetadata.remove();
   }
@@ -582,7 +579,7 @@ export async function prepareDefaultContentForCopy(ctx, data, blockURL) {
 export async function copyDefaultContentToClipboard(
   context,
   wrapper,
-  blockURL
+  blockURL,
 ) {
   async function prepare(ctx, data) {
     return prepareDefaultContentForCopy(ctx, data, blockURL);
@@ -624,7 +621,7 @@ export async function preparePageForCopy(ctx, data, blockURL) {
 
     // Does the current section have any blocks?
     const blocks = section.querySelectorAll(
-      ':scope > div:not(.section-metadata)'
+      ':scope > div:not(.section-metadata)',
     );
     for (const block of blocks) {
       // Convert the block to a table
@@ -632,7 +629,7 @@ export async function preparePageForCopy(ctx, data, blockURL) {
         ctx,
         block,
         getBlockName(block, true),
-        blockURL
+        blockURL,
       );
 
       // Insert a br after every table to add some spacing in the document
@@ -643,12 +640,12 @@ export async function preparePageForCopy(ctx, data, blockURL) {
     }
 
     const sectionMetadata = section.querySelector(
-      ':scope > div.section-metadata'
+      ':scope > div.section-metadata',
     );
     const sectionMetadataTable = await getSectionMetadata(
       ctx,
       section,
-      blockURL
+      blockURL,
     );
     if (sectionMetadataTable) {
       sectionMetadata.replaceWith(createTag('br'), sectionMetadataTable);
@@ -677,7 +674,7 @@ export async function copyPageToClipboard(
   context,
   wrapper,
   blockURL,
-  pageMetadata
+  pageMetadata,
 ) {
   async function prepare(ctx, data) {
     return preparePageForCopy(ctx, data, blockURL);
@@ -702,24 +699,20 @@ export async function copyPageToClipboard(
  */
 export function getBlockTableStyle(
   defaultLibraryMetadata,
-  sectionLibraryMetadata
+  sectionLibraryMetadata,
 ) {
   const tableStyle = {};
 
   if (sectionLibraryMetadata.tableheaderbackgroundcolor) {
-    tableStyle.tableHeaderBackgroundColor =
-      sectionLibraryMetadata.tableheaderbackgroundcolor;
+    tableStyle.tableHeaderBackgroundColor = sectionLibraryMetadata.tableheaderbackgroundcolor;
   } else if (defaultLibraryMetadata.tableheaderbackgroundcolor) {
-    tableStyle.tableHeaderBackgroundColor =
-      defaultLibraryMetadata.tableheaderbackgroundcolor;
+    tableStyle.tableHeaderBackgroundColor = defaultLibraryMetadata.tableheaderbackgroundcolor;
   }
 
   if (sectionLibraryMetadata.tableheaderforegroundcolor) {
-    tableStyle.tableHeaderForegroundColor =
-      sectionLibraryMetadata.tableheaderforegroundcolor;
+    tableStyle.tableHeaderForegroundColor = sectionLibraryMetadata.tableheaderforegroundcolor;
   } else if (defaultLibraryMetadata.tableheaderforegroundcolor) {
-    tableStyle.tableHeaderForegroundColor =
-      defaultLibraryMetadata.tableheaderforegroundcolor;
+    tableStyle.tableHeaderForegroundColor = defaultLibraryMetadata.tableheaderforegroundcolor;
   }
 
   return tableStyle;

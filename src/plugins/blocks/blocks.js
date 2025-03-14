@@ -88,8 +88,8 @@ function getViewPorts(contextViewPorts) {
   ];
   if (contextViewPorts && contextViewPorts.length > 0) {
     if (
-      contextViewPorts.length === 2 &&
-      contextViewPorts.every(breakpoint => Number.isInteger(breakpoint))
+      contextViewPorts.length === 2
+      && contextViewPorts.every(breakpoint => Number.isInteger(breakpoint))
     ) {
       for (let i = 0; i < 2; i += 1) {
         viewPorts[i].width = `${contextViewPorts[i] - 1}px`;
@@ -115,11 +115,11 @@ function renderFrame(contextViewPorts, container) {
         <sp-icon-${viewPort.icon} slot="icon"></sp-icon-${viewPort.icon}>
           ${viewPort.label}
         </sp-action-button>
-    `
+    `,
       )
       .join('');
     const selectedViewPortIndex = viewPorts.findIndex(
-      viewPort => viewPort.default
+      viewPort => viewPort.default,
     );
 
     const contentContainer = container.querySelector('.content');
@@ -173,7 +173,7 @@ function renderFrame(contextViewPorts, container) {
         buttonClone?.addEventListener('click', () => {
           frameView.style.width = viewPorts[index].width;
         });
-      }
+      },
     );
   }
 }
@@ -210,7 +210,7 @@ function updateDetailsContainer(container, title, description) {
   }
 
   // Listen for the table-ready event
-  document.addEventListener('table-ready', event => {
+  document.addEventListener('table-ready', (event) => {
     const { table } = event.detail;
     const tableTab = container.querySelector('.table-tab');
     // Clear existing content
@@ -233,10 +233,10 @@ function attachCopyButtonEventListener(
   blockRenderer,
   defaultLibraryMetadata,
   sectionLibraryMetadata,
-  pageMetadata
+  pageMetadata,
 ) {
   const copyButton = removeAllEventListeners(
-    container.querySelector('.content .copy-button')
+    container.querySelector('.content .copy-button'),
   );
   copyButton.addEventListener('click', async () => {
     const copyElement = blockRenderer.getBlockElement();
@@ -246,38 +246,38 @@ function attachCopyButtonEventListener(
     // Are we trying to copy a block, a page or default content?
     // The copy operation is slightly different depending on which
     if (
-      defaultLibraryMetadata.type === 'template' ||
-      sectionLibraryMetadata.multiSectionBlock ||
-      sectionLibraryMetadata.compoundBlock
+      defaultLibraryMetadata.type === 'template'
+      || sectionLibraryMetadata.multiSectionBlock
+      || sectionLibraryMetadata.compoundBlock
     ) {
       await copyPageToClipboard(
         context,
         copyWrapper,
         copyBlockData.url,
-        pageMetadata
+        pageMetadata,
       );
     } else if (blockRenderer.isBlock) {
       const tableStyle = getBlockTableStyle(
         defaultLibraryMetadata,
-        sectionLibraryMetadata
+        sectionLibraryMetadata,
       );
       await copyBlockToClipboard(
         context,
         copyWrapper,
         getBlockName(copyElement, true),
         copyBlockData.url,
-        tableStyle
+        tableStyle,
       );
     } else {
       await copyDefaultContentToClipboard(
         context,
         copyWrapper,
-        copyBlockData.url
+        copyBlockData.url,
       );
     }
 
     container.dispatchEvent(
-      new CustomEvent('Toast', { detail: { message: 'Copied Block' } })
+      new CustomEvent('Toast', { detail: { message: 'Copied Block' } }),
     );
   });
 }
@@ -287,7 +287,7 @@ function getTable(
   blockRenderer,
   defaultLibraryMetadata,
   sectionLibraryMetadata,
-  pageMetadata
+  pageMetadata,
 ) {
   const copyWrapper = blockRenderer.getBlockWrapper();
   const copyBlockData = blockRenderer.getBlockData();
@@ -295,9 +295,9 @@ function getTable(
   // Are we trying to copy a block, a page or default content?
   // The copy operation is slightly different depending on which
   if (
-    defaultLibraryMetadata.type === 'template' ||
-    sectionLibraryMetadata.multiSectionBlock ||
-    sectionLibraryMetadata.compoundBlock
+    defaultLibraryMetadata.type === 'template'
+    || sectionLibraryMetadata.multiSectionBlock
+    || sectionLibraryMetadata.compoundBlock
   ) {
     return preparePageForCopy(
       context,
@@ -306,13 +306,13 @@ function getTable(
         pageMeta: pageMetadata,
         url: copyBlockData.url,
       },
-      copyBlockData.url
+      copyBlockData.url,
     );
   }
   if (blockRenderer.isBlock) {
     const tableStyle = getBlockTableStyle(
       defaultLibraryMetadata,
-      sectionLibraryMetadata
+      sectionLibraryMetadata,
     );
     return prepareBlockForCopy(
       context,
@@ -322,7 +322,7 @@ function getTable(
         url: copyBlockData.url,
       },
       copyBlockData.url,
-      tableStyle
+      tableStyle,
     );
   }
   return prepareDefaultContentForCopy(context, copyWrapper, copyBlockData.url);
@@ -342,16 +342,16 @@ async function onBlockListCopyButtonClicked(context, event, container) {
   // we are dealing with a block or default content
   const block = wrapper.querySelector(':scope > div:not(.section-metadata)');
   if (
-    defaultLibraryMetadata &&
-    (defaultLibraryMetadata.type === 'template' ||
-      sectionLibraryMetadata.multiSectionBlock ||
-      sectionLibraryMetadata.compoundBlock)
+    defaultLibraryMetadata
+    && (defaultLibraryMetadata.type === 'template'
+      || sectionLibraryMetadata.multiSectionBlock
+      || sectionLibraryMetadata.compoundBlock)
   ) {
     await copyPageToClipboard(context, wrapper, blockURL, pageMetadata);
   } else if (block) {
     const tableStyle = getBlockTableStyle(
       defaultLibraryMetadata,
-      sectionLibraryMetadata
+      sectionLibraryMetadata,
     );
     await copyBlockToClipboard(context, wrapper, name, blockURL, tableStyle);
   } else {
@@ -360,7 +360,7 @@ async function onBlockListCopyButtonClicked(context, event, container) {
   container.dispatchEvent(
     new CustomEvent('Toast', {
       detail: { message: 'Copied Block', target: wrapper },
-    })
+    }),
   );
 }
 
@@ -369,19 +369,19 @@ async function triggerTableReady(
   blockRenderer,
   defaultLibraryMetadata,
   sectionLibraryMetadata,
-  pageMetadata
+  pageMetadata,
 ) {
   const table = await getTable(
     context,
     blockRenderer,
     defaultLibraryMetadata,
     sectionLibraryMetadata,
-    pageMetadata
+    pageMetadata,
   );
   document.dispatchEvent(
     new CustomEvent('table-ready', {
       detail: { table },
-    })
+    }),
   );
 }
 
@@ -403,8 +403,7 @@ function loadBlock(context, event, container) {
   renderFrame(context.viewPorts, content);
 
   // For blocks we pull the block name from section metadata or the name given to the block
-  const authoredBlockName =
-    sectionLibraryMetadata.name ?? getBlockName(blockElement);
+  const authoredBlockName = sectionLibraryMetadata.name ?? getBlockName(blockElement);
 
   // Pull the description for this block,
   // first from sectionLibraryMetadata and fallback to defaultLibraryMetadata
@@ -421,7 +420,7 @@ function loadBlock(context, event, container) {
     container,
     sectionLibraryMetadata,
     defaultLibraryMetadata,
-    context
+    context,
   );
 
   const blockRenderer = content.querySelector('block-renderer');
@@ -433,7 +432,7 @@ function loadBlock(context, event, container) {
     blockWrapper,
     defaultLibraryMetadata,
     sectionLibraryMetadata,
-    container
+    container,
   );
 
   // Append the path and index of the current block to the url params
@@ -449,7 +448,7 @@ function loadBlock(context, event, container) {
     blockRenderer,
     defaultLibraryMetadata,
     sectionLibraryMetadata,
-    undefined
+    undefined,
   );
 
   triggerTableReady(
@@ -457,7 +456,7 @@ function loadBlock(context, event, container) {
     blockRenderer,
     defaultLibraryMetadata,
     sectionLibraryMetadata,
-    undefined
+    undefined,
   );
 
   // Track block view
@@ -483,7 +482,7 @@ function loadTemplate(context, event, container) {
 
   // Pull the description for this page from default metadata.
   const templateDescription = parseDescription(
-    defaultLibraryMetadata.description
+    defaultLibraryMetadata.description,
   );
 
   // Set template title & description in UI
@@ -494,7 +493,7 @@ function loadTemplate(context, event, container) {
     container,
     sectionLibraryMetadata,
     defaultLibraryMetadata,
-    context
+    context,
   );
 
   const blockRenderer = content.querySelector('block-renderer');
@@ -506,7 +505,7 @@ function loadTemplate(context, event, container) {
     blockWrapper,
     defaultLibraryMetadata,
     sectionLibraryMetadata,
-    container
+    container,
   );
 
   // Append the path and index of the current block to the url params
@@ -519,7 +518,7 @@ function loadTemplate(context, event, container) {
     blockRenderer,
     defaultLibraryMetadata,
     sectionLibraryMetadata,
-    pageMetadata
+    pageMetadata,
   );
 
   // Track block view
@@ -529,12 +528,11 @@ function loadTemplate(context, event, container) {
 function handleCopyButton(
   container,
   sectionLibraryMetadata,
-  defaultLibraryMetadata
+  defaultLibraryMetadata,
 ) {
-  const disableCopyButton =
-    sectionLibraryMetadata?.disablecopy ??
-    defaultLibraryMetadata?.disablecopy ??
-    false;
+  const disableCopyButton = sectionLibraryMetadata?.disablecopy
+    ?? defaultLibraryMetadata?.disablecopy
+    ?? false;
 
   const copyButton = container.querySelector('.content .copy-button');
   copyButton.removeAttribute('disabled');
@@ -547,13 +545,12 @@ function handleSplitView(
   container,
   sectionLibraryMetadata,
   defaultLibraryMetadata,
-  context
+  context,
 ) {
-  const hideDetailsView =
-    sectionLibraryMetadata?.hidedetailsview ??
-    defaultLibraryMetadata?.hidedetailsview ??
-    context?.hidedetailsview ??
-    false;
+  const hideDetailsView = sectionLibraryMetadata?.hidedetailsview
+    ?? defaultLibraryMetadata?.hidedetailsview
+    ?? context?.hidedetailsview
+    ?? false;
 
   const splitView = container.querySelector('.content sp-split-view');
   splitView.primarySize = hideDetailsView ? '100%' : '75%';
@@ -570,7 +567,7 @@ export async function decorate(container, data, searchTerm, context) {
   const content = createTag(
     'div',
     { class: 'block-library' },
-    renderScaffolding()
+    renderScaffolding(),
   );
   container.append(content);
   const listContainer = content.querySelector('.list-container');
@@ -578,27 +575,21 @@ export async function decorate(container, data, searchTerm, context) {
   const blockList = createTag('block-list');
   listContainer.append(blockList);
 
-  blockList.addEventListener('PreviewBlock', e => {
+  blockList.addEventListener('PreviewBlock', (e) => {
     window.open(e.details.path, '_blockpreview');
   });
 
   // Handle LoadTemplate events
-  blockList.addEventListener('LoadTemplate', loadPageEvent =>
-    loadTemplate(context, loadPageEvent, container)
-  );
+  blockList.addEventListener('LoadTemplate', loadPageEvent => loadTemplate(context, loadPageEvent, container));
 
   // Handle LoadBlock events
-  blockList.addEventListener('LoadBlock', loadBlockEvent =>
-    loadBlock(context, loadBlockEvent, container)
-  );
+  blockList.addEventListener('LoadBlock', loadBlockEvent => loadBlock(context, loadBlockEvent, container));
 
   // Handle CopyBlock events from the block list
-  blockList.addEventListener('CopyBlock', blockListCopyEvent =>
-    onBlockListCopyButtonClicked(context, blockListCopyEvent, container)
-  );
+  blockList.addEventListener('CopyBlock', blockListCopyEvent => onBlockListCopyButtonClicked(context, blockListCopyEvent, container));
 
   const search = content.querySelector('sp-search');
-  search.addEventListener('input', e => {
+  search.addEventListener('input', (e) => {
     blockList.filterBlocks(e.target.value);
   });
 
